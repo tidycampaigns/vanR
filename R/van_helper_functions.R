@@ -2,78 +2,98 @@
 
 library(dplyr)
 library(httr)
+library(RCurl, include.only = 'base64')
+library(glue, include.only = 'glue')
+library(tibble, include.only = 'tibble_row')
+library(tidyr, include.only = 'unnest_wider')
 
-# Function to turn API key information in proper format for data retrieval
-# Password = API Key
-# For db, enter 1 for EA, 0 for myVoters
+#' @title van_auth
+#' @description Function to turn API key information in proper format for data retrieval
+#'
+#' @param username username associated with API Key
+#' @param password The API Key
+#' @param db For db, enter 1 for EA, 0 for myVoters
 van_auth <- function(username,password,db){
-  
+
   # Because of course it has to be sent in base64...
   api_key <- paste0(username,':',password,'|', db)
-  api_base64 <<- paste0('Basic ',RCurl::base64(api_key)[1])
-  
+  api_base64 <<- paste0('Basic ',base64(api_key)[1])
+
 }
 
-# Function to pull all info on a given vanid
-# Options for expand: phones, emails, addresses, customFields, externalIds, recordedAddresses, 
-# preferences, suppressions, reportedDemographics, disclosureFieldValues
+#' get_contact_info
+#'
+#' @description Function to pull all people info on a given vanid.
+#'
+#' Options for expand: phones, emails, addresses, customFields, externalIds, recordedAddresses,
+#' preferences, suppressions, reportedDemographics, disclosureFieldValues
+#'
+#' @param vanid Numeric person identifier
+#' @param expand Character string representing a block of extra fields to include
+#'
+#' @return A table with all information found on a given individual
 get_contact_info <- function(vanid, expand='None'){
-  
+
   # Making sure API key is available
   if(exists('api_base64')){
     print("Authentication found, making API call")
   }else if(!exists('api_base64')){
     stop("Authentication needed, run van_auth() first.")
   }
-  
+
   # URL for API Call
   url <- if_else(expand == 'None'
-                 ,glue::glue("https://api.securevan.com/v4/people/{vanid}")
-                 ,glue::glue("https://api.securevan.com/v4/people/{vanid}?$expand={expand}")
+                 ,glue("https://api.securevan.com/v4/people/{vanid}")
+                 ,glue("https://api.securevan.com/v4/people/{vanid}?$expand={expand}")
                  )
-  
+
   # API Call
   contact_raw <- VERB("GET", url, add_headers('authorization' = api_base64), content_type("application/octet-stream"), accept("application/json")) %>%
     content()
-  
-  contact <- contact_raw %>% 
+
+  # Turning returned JSON into a table
+  contact <- contact_raw %>%
     list() %>%
-    tibble::tibble_row(newdata=`.`) %>% 
-    tidyr::unnest_wider(col=newdata)
-  
+    tibble_row(newdata=`.`) %>%
+    unnest_wider(col=newdata)
+
   return(contact)
 
 }
 
-# Function that makes an API call for VANIDs associated with a given event and returns a table of all event registrants.
-# Can be expanded for more fields
+#' @title get_vanids
+#' @description Function that makes an API call for VANIDs associated with a given event and returns a table of all event registrants. Can be expanded for more fields
+#'
+#' @param event_id Numeric event identifier
+#'
+#' @return A table table containing the VAN ID, first/last name, and signup date for event registrants
 get_vanids <- function(event_id){
-  
+
   # Making sure API key is available
   if(exists('api_base64')){
     print("Authentication found, making API call")
   }else if(!exists('api_base64')){
     stop("Authentication needed, run van_auth() first.")
   }
-  
+
   van_url <- glue("https://api.securevan.com/v4/signups?eventId={event_id}")
-  
-  signups_raw <- VERB("GET", van_url, add_headers('authorization' = api_base64), content_type("application/octet-stream"), accept("application/json")) 
-  
+
+  signups_raw <- VERB("GET", van_url, add_headers('authorization' = api_base64), content_type("application/octet-stream"), accept("application/json"))
+
   signups <- content(signups_raw)$items
-  
+
   event_vanid_tbl <- tibble(
     eventid = character()
     ,vanid = numeric()
     ,firstname = character()
     ,lastname = character()
     ,signup_dte=character())
-  
+
   if(length(signups) > 0){
     for (x in 1:length(signups)){
-      
+
       signupdte = signups[[x]]$dateModified
-      
+
       event_vanid_tbl <- add_row(
         event_vanid_tbl
         ,eventid = event_id
@@ -83,10 +103,10 @@ get_vanids <- function(event_id){
         ,signup_dte = signupdte
       )
     }
-    
+
     print(paste0('done with eventid: ', event_id))
-    
+
     return(event_vanid_tbl)
   }
-  
+
 }
