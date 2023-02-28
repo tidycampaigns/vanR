@@ -13,6 +13,8 @@ library(tidyr, include.only = 'unnest_wider')
 #' @param username username associated with API Key
 #' @param password The API Key
 #' @param db For db, enter 1 for EA, 0 for myVoters
+#'
+#' @export
 van_auth <- function(username,password,db){
 
   # Because of course it has to be sent in base64...
@@ -32,6 +34,10 @@ van_auth <- function(username,password,db){
 #' @param expand Character string representing a block of extra fields to include
 #'
 #' @return A table with all information found on a given individual
+#'
+#' @export
+#'
+#' @importFrom dplyr "%>%"
 get_contact_info <- function(vanid, expand='None'){
 
   # Making sure API key is available
@@ -67,6 +73,10 @@ get_contact_info <- function(vanid, expand='None'){
 #' @param event_id Numeric event identifier
 #'
 #' @return A table table containing the VAN ID, first/last name, and signup date for event registrants
+#'
+#' @export
+#'
+#' @importFrom dplyr "%>%"
 get_vanids <- function(event_id){
 
   # Making sure API key is available
