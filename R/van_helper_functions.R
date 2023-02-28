@@ -1,12 +1,5 @@
 # Functions to make pulling VAN data easier
 
-library(dplyr)
-library(httr)
-library(RCurl, include.only = 'base64')
-library(glue, include.only = 'glue')
-library(tibble, include.only = 'tibble_row')
-library(tidyr, include.only = 'unnest_wider')
-
 #' @title van_auth
 #' @description Function to turn API key information in proper format for data retrieval
 #'
@@ -15,6 +8,7 @@ library(tidyr, include.only = 'unnest_wider')
 #' @param db For db, enter 1 for EA, 0 for myVoters
 #'
 #' @export
+#' @importFrom RCurl "base64"
 van_auth <- function(username,password,db){
 
   # Because of course it has to be sent in base64...
@@ -37,7 +31,11 @@ van_auth <- function(username,password,db){
 #'
 #' @export
 #'
-#' @importFrom dplyr "%>%"
+#' @import httr
+#' @import dplyr
+#' @importFrom glue "glue"
+#' @importFrom tidyr "unnest_wider"
+#' @importFrom tibble "tibble_row"
 get_contact_info <- function(vanid, expand='None'){
 
   # Making sure API key is available
@@ -76,7 +74,8 @@ get_contact_info <- function(vanid, expand='None'){
 #'
 #' @export
 #'
-#' @importFrom dplyr "%>%"
+#' @import dplyr
+#' @import httr
 get_vanids <- function(event_id){
 
   # Making sure API key is available
