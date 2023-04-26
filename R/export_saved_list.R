@@ -41,4 +41,5 @@ export_saved_list <- function(listid, listname) {
 
   assign(listname, export, envir = .GlobalEnv)
 
+  print(paste0("successfully downloaded list: ", listname))
 }
