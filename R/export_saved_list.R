@@ -13,7 +13,7 @@
 #' @import dplyr
 #' @importFrom glue "glue"
 
-export_saved_list <- function(listid, listname) {
+export_saved_list <- function(listid, listname=NULL) {
   
   # Making sure API key is available
   if(exists('api_base64')){
@@ -23,23 +23,33 @@ export_saved_list <- function(listid, listname) {
   }
   
   # URL for API Call
-  url <- glue::glue("https://api.securevan.com/v4/exportJobs")
+  url_export <- glue::glue("https://api.securevan.com/v4/exportJobs")
+  url_savedlist <- glue::glue("https://api.securevan.com/v4/savedLists/{listid}")
   
   # Body for API Call
-  json <- list(
+  json_export <- list(
     savedListID = as.character(listid),
     type = 4,
     webhookUrl = "https://webhook.example.org/completedExportJobs"
     )
+  
+  json_listname <- list(
+    savedListID = as.character(listid)
+  )
 
   # API Call
-  datareturn <- VERB("POST", url, add_headers('authorization' = api_base64), content_type("application/json"), accept("application/json"), body = json, encode = "json") %>%
+  datareturn <- VERB("POST", url_export, add_headers('authorization' = api_base64), content_type("application/json"), accept("application/json"), body = json_export, encode = "json") %>%
+    content()
+  
+  name_return <- VERB("GET", url_savedlist, add_headers('authorization' = api_base64), content_type("application/json"), accept("application/json"), body = json_listname, encode = "json") %>%
     content()
   
   # Pull VANIDs from CSV at Download URL and save to global environment
   export <- read.csv(datareturn$downloadUrl) %>% pull(VanID)
 
-  assign(listname, export, envir = .GlobalEnv)
+  name <- coalesce(listname, name_return$name)
 
-  print(paste0("successfully downloaded list: ", listname))
+  assign(name, export, envir = .GlobalEnv)
+
+  print(paste0("successfully downloaded list: ", name))
 }
