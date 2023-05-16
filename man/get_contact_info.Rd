@@ -9,14 +9,11 @@ get_contact_info(vanid, expand = "None")
 \arguments{
 \item{vanid}{Numeric person identifier}
 
-\item{expand}{Character string representing a block of extra fields to include}
+\item{expand}{Character string representing a block of extra fields to include. Options are: phones, emails, addresses, customFields, externalIds, recordedAddresses, preferences, suppressions, reportedDemographics, disclosureFieldValues.}
 }
 \value{
 A table with all information found on a given individual
 }
 \description{
 Function to pull all people info on a given vanid.
-
-Options for expand: phones, emails, addresses, customFields, externalIds, recordedAddresses,
-preferences, suppressions, reportedDemographics, disclosureFieldValues
 }
