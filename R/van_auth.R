@@ -8,7 +8,7 @@
 #' @param db For db, enter 1 for EA, 0 for myVoters
 #'
 #' @export
-#' @importFrom RCurl "base64"
+#' @importFrom RCurl base64
 van_auth <- function(username,password,db){
 
   # Because of course it has to be sent in base64...

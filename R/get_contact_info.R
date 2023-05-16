@@ -12,9 +12,9 @@
 #'
 #' @import httr
 #' @import dplyr
-#' @importFrom glue "glue"
-#' @importFrom tidyr "unnest_wider"
-#' @importFrom tibble "tibble_row"
+#' @importFrom glue glue
+#' @importFrom tidyr unnest_wider
+#' @importFrom tibble tibble_row
 get_contact_info <- function(vanid, expand='None'){
 
   # TO DO: Pull this auth check out as it's own function
