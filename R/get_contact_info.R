@@ -2,11 +2,9 @@
 #'
 #' @description Function to pull all people info on a given vanid.
 #'
-#' Options for expand: phones, emails, addresses, customFields, externalIds, recordedAddresses,
-#' preferences, suppressions, reportedDemographics, disclosureFieldValues
 #'
 #' @param vanid Numeric person identifier
-#' @param expand Character string representing a block of extra fields to include
+#' @param expand Character string representing a block of extra fields to include. Options are: phones, emails, addresses, customFields, externalIds, recordedAddresses, preferences, suppressions, reportedDemographics, disclosureFieldValues.
 #'
 #' @return A table with all information found on a given individual
 #'
