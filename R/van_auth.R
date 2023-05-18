@@ -1,7 +1,7 @@
 # Functions to make pulling VAN data easier
 
 #' @title van_auth
-#' @description Function to turn API key information in proper format for data retrieval
+#' @description Function to turn API key information into proper format for data retrieval
 #'
 #' @param username username associated with API Key
 #' @param password The API Key
